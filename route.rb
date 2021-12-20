@@ -1,28 +1,52 @@
 require_relative 'instance_counter.rb'
 require_relative 'validate.rb'
-class Route
+
+class Station
   include InstanceCounter
-  include Validate  
-  attr_accessor :stations 
-  attr_reader   :stations, 
-                :name_route
-  def initialize (st_first, st_last, name_route)
-    @name_route = name_route
-    @stations   = [st_first, st_last]
+  include Validate
+
+  @@all = []
+
+  attr_reader :name, 
+              :trains_on_station
+  def initialize(name)
+    @@all.push(self)
+    @name = name  
+    @trains_on_station = []
     validate!
   end
-  def add_station (station)
-    @stations.insert(-2, station) unless @stations.include? station
+
+  def add_trains (train)
+    @trains_on_station << train
   end
-  def del_stations (station)
-    return unless (@stations.first || @stations.last) != station
-    @stations.delete(station)
+
+  def del_trains (train)
+    trains_on_station.delete(train)
   end
+
+  def show_trains
+    @trains_on_station.each { |train| puts train.name }
+  end
+
+  def return_type(type)
+    count_of_type = @trains_on_station.select { |train| train.type == type }
+    count_of_type.count
+  end
+
+  def self.all
+    @@all
+  end
+
+  def each_train(&block)
+    raise "Поезда на станции #{name} отсутствуют." if @trains_on_station.empty?
+    @trains_on_station.each { |train| block.call(train) } if block_given?
+  end
+
   protected
+  
   def validate!
-    raise "Название маршрута не может быть пустым" if @name_route.empty?
-    raise "Названия станций на могут быть пустыми" if @stations.first.name.empty? || @stations.last.name.empty?
-    #raise "Для формирования маршрута необходимо две станции" if @stations.size != 2 
+    raise "Название не может быть пустым" if name.empty?
+    raise "Номер не может иметь длину больше 15 символов" if name.length > 15
     true
   end
 end
