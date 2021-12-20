@@ -6,9 +6,11 @@ class CargoCar < Car
     @volume = volume.to_i
     validate!
   end
-  def filling_the_car
-    @volume = @volume - 1 if @volume > 0
+
+  def filling_the_car (vol)
+    @volume = @volume - vol.to_i if @volume > 0
   end
+  
   def engaged
     @init_vol - @volume
   end 
