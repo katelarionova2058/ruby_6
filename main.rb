@@ -6,10 +6,7 @@ require_relative 'pass_car'
 require_relative 'cargo_car'
 require_relative 'station'
 require_relative 'route'
-
-
 class Controller
-
   def menu
     puts "Меню:"
     puts "1 - Создать станцию"
@@ -22,12 +19,9 @@ class Controller
     puts "8 - Информация"
     puts "9 - Занять место"
   end
-
-
   attr_reader :stations,
               :trains,
               :routes
-
   def initialize  
     @stations = []
     @trains   = []
@@ -37,7 +31,6 @@ class Controller
       run
     end
   end
-
   def run
     puts "Что вы хотите сделать?"
     action = gets.chomp
@@ -59,12 +52,12 @@ class Controller
       when "8"
         info
       when "9"
-        take_pl
+        filling
       else
         exit
     end
   end
-
+  private
   def new_station
     begin
       puts "Укажите Наименование станции"
@@ -79,7 +72,6 @@ class Controller
     puts "Создана станция #{name}"
     return @station
    end
-
   def new_pass_trains
     begin
       puts "Укажите Наименование поезда"
@@ -93,9 +85,7 @@ class Controller
     designate_manufacturer
     @trains.push(@new_train)
     puts "Создан поезд #{name} от производителя #{@new_train.fabrica}"
-
   end
-
   def new_cargo_trains
     begin
       puts "Укажите Наименование поезда"
@@ -110,8 +100,6 @@ class Controller
     @trains.push(@new_train)
     puts "Создан поезд #{name} от производителя #{@new_train.fabrica}"
   end
-
-
   def new_route
     puts "Укажите название маршрута"
     name_route  = gets.chomp
@@ -122,7 +110,6 @@ class Controller
     @route = Route.new st_first , st_last, name_route
     @routes.push(@route)
   end
-
   def add_station_in_route
     puts "Укажите название маршрута"
     route_get  = gets.chomp  
@@ -130,7 +117,6 @@ class Controller
     new_station
     search_of_route.add_station @station
   end
-
   def del_station_in_route
     puts "Укажите название маршрута"
     route_get  = gets.chomp
@@ -138,7 +124,6 @@ class Controller
     station_get  = gets.chomp
     search_of_route.del_stations (station_get)
   end
-
   def train_to_roat
     puts "Укажите название поезда"
     train_get  = gets.chomp
@@ -149,21 +134,18 @@ class Controller
     search_of_train.add_route search_of_route
     search_of_route.stations.first.show_trains
   end
-
   def move_to_back
     puts "Укажите название поезда"
     train_get  = gets.chomp
     search_of_train = @trains.bsearch { |train| train.name == train_get }
     search_of_train.back
   end
-
   def move_to_forward
     puts "Укажите название поезда"
     train_get  = gets.chomp
     search_of_train = @trains.bsearch { |train| train.name == train_get }
     search_of_train.next
   end
-
   def add_car
     puts "Укажите название поезда"
     train_get  = gets.chomp
@@ -189,20 +171,15 @@ class Controller
     car.type = search_of_train.type
     search_of_train.add_cars(car)
   end
-
-
-
   def del_car
     puts "Укажите название поезда"
     train_get  = gets.chomp
     search_of_train = @trains.bsearch { |train| train.name == train_get }
     search_of_train.del_cars
   end
-
   def show_stations
     @stations.each { |station| puts station.class}
   end
-
   def new_train
     puts "Выберите тип поезда"
     puts "1 - грузовой "
@@ -215,7 +192,6 @@ class Controller
         new_pass_trains 
     end
   end
-
   def change_route
     puts "1 - Добавить станцию"
     puts "2 - Удалить станцию"
@@ -227,7 +203,6 @@ class Controller
         del_station_in_route  
     end
   end
-
   def railway_train
     puts "1 - добавить вагон"
     puts "2 - удалить вагон"
@@ -239,7 +214,6 @@ class Controller
        del_car
     end
   end
-
   def moving
     puts "1 - Переместить назад"
     puts "2 - Переместить вперед"
@@ -251,7 +225,6 @@ class Controller
         move_to_forward
     end
   end
-
   def info
     puts "1 - Список станций"
     puts "2 - Список поездов на станции"
@@ -269,28 +242,26 @@ class Controller
         show_cars_on_tr
     end
   end
-
   def designate_manufacturer
     puts "Укажите производителя поезда"
     manfact = gets.chomp
     @new_train.fabricator(manfact)
-  end
-  
+  end  
   def info_manufacturer
     puts "Укажите номер поезда"
     train_get = gets.chomp
     search_train = @trains.bsearch { |train| train.name == train_get }
     puts search_train.fabrica
   end
-
-  def take_pl
+  def filling
     puts "Укажите название поезда"
     train_get  = gets.chomp
     puts "Укажите номер вагона"
     car_get  = gets.chomp
-    take_place train_get, car_get
+    search_of_train = @trains.bsearch { |train| train.name == train_get}
+    search_of_num = search_of_train.cars.bsearch { |car| car.number == car_get }
+    search_of_num.filling_the_car
   end
-
   def show_trains_on_st
     if @stations.empty?
       puts 'Не создано ни одной станции'
@@ -301,7 +272,6 @@ class Controller
       station.each_train { |train| print "Название: ", train.name, " Тип: ", train.type, " Производитель: ", train.fabrica, "\n" }
     end
   end
-
   def show_cars_on_tr
     if @trains.empty?
       puts 'Не создано ни одного поезда'
@@ -312,9 +282,5 @@ class Controller
       train.each_cars { |car| print "Номер: ", car.number, " Тип: ", car.type,  "\n" }
     end
   end
-
-
 end
-
 control =Controller.new
-
